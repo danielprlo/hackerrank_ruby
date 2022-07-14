@@ -17,6 +17,7 @@ def climbingLeaderboard(ranked, player)
     rankedLenght = ranked.length
     playerCurrentPosition = rankedLenght
     firstRound = true
+    dictionary = {}
     player.each do |play|
         playerScoreFound = false
         # Remove old play from the board
@@ -38,15 +39,22 @@ def climbingLeaderboard(ranked, player)
             end
         end
 
-        previousValue = -1
+        previousValue = Float::INFINITY
         boardScore = 0
-        (playerCurrentPosition -1).downto(0) do |i|
-            if ranked[i] > previousValue
-                boardScore += 1
-                previousValue = ranked[i]
+        if dictionary.empty?()
+            (0).upto(playerCurrentPosition) do |i|
+                if ranked[i] < previousValue
+                    boardScore += 1
+                    dictionary[i] = boardScore
+                    previousValue = ranked[i]
+                elsif ranked[i] == previousValue
+                    dictionary[i] = boardScore    
+                end
             end
         end
-        positions.append(boardScore+1)
+
+
+        positions.append(dictionary[playerCurrentPosition])
     end
     return positions
 end
