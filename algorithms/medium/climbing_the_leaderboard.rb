@@ -14,43 +14,42 @@ require 'stringio'
 
 def climbingLeaderboard(ranked, player)
     positions = []
-    bestScorePlayer = -1
-    bestScorePlayerIndex = -1
-
+    rankedLenght = ranked.length
+    playerCurrentPosition = rankedLenght
+    firstRound = true
     player.each do |play|
-        if (play > bestScorePlayer)
-            bestScorePlayer = play
-            polPosition = 0
-            previousScore = -1
-            ranked.each_with_index do |rank, index|
-                if rank != previousScore
-                    polPosition += 1
-                    previousScore = rank
-                end
-                if play >= rank
-                    if (bestScorePlayerIndex != -1)
-                        ranked.delete_at(bestScorePlayerIndex)
-                    end
-                    
-                    bestScorePlayerIndex = index
-                    ranked.insert(index, play)
-                    positions.append(polPosition)
-                    print(ranked)
-                    puts('')
-                    puts(polPosition)
-                    break
-                end
-
-                # checked
-                if (bestScorePlayerIndex == -1)
-                    ranked.append(play)
-                    bestScorePlayerIndex = ranked.length-1
-                end
-
+        playerScoreFound = false
+        # Remove old play from the board
+        if !firstRound
+            ranked.delete_at(playerCurrentPosition)
+        end
+        firstRound = false
+        
+        (playerCurrentPosition -1).downto(0) do |i|
+            # Search from that position backwards in the loop
+            if !playerScoreFound && play < ranked[i] 
+                ranked.insert(i+1, play)
+                playerCurrentPosition = i+1
+                break                
+            end
+            if !playerScoreFound && i == 0
+                playerCurrentPosition = 0
+                ranked.insert(0, play)
             end
         end
+
+        previousValue = -1
+        boardScore = 0
+        (playerCurrentPosition -1).downto(0) do |i|
+            if ranked[i] > previousValue
+                boardScore += 1
+                previousValue = ranked[i]
+            end
+        end
+        positions.append(boardScore+1)
     end
-    print(positions)
+    return positions
 end
 
+# 
 print(climbingLeaderboard([100,100,50,40,40,20,10], [5,25,50,120]))
