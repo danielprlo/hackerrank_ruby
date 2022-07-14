@@ -14,47 +14,43 @@ require 'stringio'
 
 def climbingLeaderboard(ranked, player)
     positions = []
-    rankedLenght = ranked.length
-    playerCurrentPosition = rankedLenght
-    firstRound = true
-    dictionary = {}
+    scoreBoardPoints = {}
+    playerCurrentPosition = ranked.length
+  
     player.each do |play|
         playerScoreFound = false
-        # Remove old play from the board
-        if !firstRound
-            ranked.delete_at(playerCurrentPosition)
-        end
-        firstRound = false
-        
-        (playerCurrentPosition -1).downto(0) do |i|
-            # Search from that position backwards in the loop
-            if !playerScoreFound && play < ranked[i] 
+
+        ranked.delete_at(playerCurrentPosition)      
+
+        i = playerCurrentPosition - 1
+        while i >= 0 && !playerScoreFound
+            if play < ranked[i]
                 ranked.insert(i+1, play)
                 playerCurrentPosition = i+1
-                break                
-            end
-            if !playerScoreFound && i == 0
-                playerCurrentPosition = 0
-                ranked.insert(0, play)
-            end
+                playerScoreFound = true
+            end    
+            i -= 1
         end
 
-        previousValue = Float::INFINITY
-        boardScore = 0
-        if dictionary.empty?()
+        if !playerScoreFound
+            playerCurrentPosition = 0
+            ranked.insert(0, play)
+        end
+        
+        if scoreBoardPoints.empty?()
+            previousValue = Float::INFINITY
+            boardScore = 0
             (0).upto(playerCurrentPosition) do |i|
                 if ranked[i] < previousValue
                     boardScore += 1
-                    dictionary[i] = boardScore
+                    scoreBoardPoints[i] = boardScore
                     previousValue = ranked[i]
                 elsif ranked[i] == previousValue
-                    dictionary[i] = boardScore    
+                    scoreBoardPoints[i] = boardScore    
                 end
             end
         end
-
-
-        positions.append(dictionary[playerCurrentPosition])
+        positions.append(scoreBoardPoints[playerCurrentPosition])
     end
     return positions
 end
